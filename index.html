@@ -2,6 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8" />
+        <meta name="theme-color" content="#000000">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="The official website of Cory Keane: Digital Architect" />
         <meta name="author" content="Cory Keane" />
@@ -28,10 +29,10 @@
                     <form id="my-form" action="https://formspree.io/f/xzzvgbow" method="POST">
                         <div class="row input-group-newsletter">
                             <div class="col"><input name="email" class="form-control" id="email" type="email" placeholder="Enter email address..." aria-label="Enter email address..." required /></div>
-                            <div class="col-auto"><button class="btn btn-primary" id="my-form-button" type="submit">Notify Me!</button></div>
+                            <div class="col-auto"><button class="btn btn-primary" id="my-form-button" type="submit">Sign Up</button></div>
                         </div>
                         <div class="d-none" id="submitErrorMessage"><div class="text-center text-danger mb-3 mt-2">Error sending message!</div></div>
-                        <p id="my-form-status"></p>
+                        <p id="my-form-status">&nbsp;</p>
                     </form>
                 </div>
             </div>
@@ -64,7 +65,7 @@
               }
             }).then(response => {
               if (response.ok) {
-                status.innerHTML = "Thanks for your submission!";
+                status.innerHTML = "Thanks for signing up!";
                 form.reset()
               } else {
                 response.json().then(data => {
