@@ -85,5 +85,26 @@
           }
           form.addEventListener("submit", handleSubmit)
         </script>
+
+        <script>
+        document.addEventListener("DOMContentLoaded", () => {
+          const video = document.querySelector("video");
+          if (!video) return;
+
+          video.muted = true;
+          video.autoplay = true;
+          video.playsInline = true;
+
+          video.load();
+
+          const tryPlay = () => {
+            video.play().catch(() => {
+              setTimeout(tryPlay, 100); // Retry until it works
+            });
+          };
+
+          tryPlay();
+        });
+        </script>
     </body>
 </html>
