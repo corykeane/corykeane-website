@@ -87,24 +87,26 @@
         </script>
 
         <script>
-        document.addEventListener("DOMContentLoaded", () => {
-          const video = document.querySelector("video");
-          if (!video) return;
+          document.addEventListener("DOMContentLoaded", () => {
+            const video = document.querySelector("video");
+            if (!video) return;
 
-          video.muted = true;
-          video.autoplay = true;
-          video.playsInline = true;
+            video.muted = true;
+            video.playsInline = true;
+            video.autoplay = true;
 
-          video.load();
+            const tryPlay = () => {
+              if (video.readyState >= 2) {
+                video.play().catch(() => setTimeout(tryPlay, 100));
+              } else {
+                setTimeout(tryPlay, 100);
+              }
+            };
 
-          const tryPlay = () => {
-            video.play().catch(() => {
-              setTimeout(tryPlay, 100); // Retry until it works
-            });
-          };
-
-          tryPlay();
-        });
+            video.load();
+            tryPlay();
+          });
         </script>
+
     </body>
 </html>
