@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goal & Tag Manager</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 14px;
+        }
+
+        .export-btn {
+            margin-top: 15px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .export-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .import-container {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .reset-btn {
+            background: rgba(239, 68, 68, 0.3);
+            border: 2px solid rgba(239, 68, 68, 0.5);
+        }
+
+        .reset-btn:hover {
+            background: rgba(239, 68, 68, 0.5);
+        }
+
+        .file-input-label {
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            color: white;
+        }
+
+        .file-input-label:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background: #5568d3;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        button.secondary {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        button.secondary:hover {
+            background: #d0d0d0;
+        }
+
+        button.danger {
+            background: #ef4444;
+        }
+
+        button.danger:hover {
+            background: #dc2626;
+        }
+
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 15px;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #f3f4f6;
+            border: 2px solid #e5e7eb;
+            border-radius: 20px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tag:hover {
+            background: #e5e7eb;
+        }
+
+        .tag.active {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+
+        .tag .count {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .tag.active .count {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .tag .delete {
+            margin-left: 4px;
+            cursor: pointer;
+            opacity: 0.6;
+            font-weight: bold;
+        }
+
+        .tag .delete:hover {
+            opacity: 1;
+        }
+
+        .goals-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .goal-item {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.2s;
+            cursor: move;
+        }
+
+        .goal-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        .goal-item.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .goal-item.drag-over {
+            border-color: #667eea;
+            border-style: dashed;
+            background: #eff6ff;
+        }
+
+        .goal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .goal-text {
+            flex: 1;
+            font-size: 16px;
+            color: #1f2937;
+            font-weight: 500;
+        }
+
+        .goal-text.editing {
+            display: none;
+        }
+
+        .goal-edit-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .goal-edit-input:focus {
+            outline: none;
+            border-color: #5568d3;
+        }
+
+        .goal-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .goal-actions button {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .goal-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .goal-tag {
+            padding: 4px 10px;
+            background: #667eea;
+            color: white;
+            border-radius: 12px;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .goal-tag .remove {
+            cursor: pointer;
+            opacity: 0.8;
+            font-weight: bold;
+        }
+
+        .goal-tag .remove:hover {
+            opacity: 1;
+        }
+
+        .tag-selector {
+            margin-top: 10px;
+            padding: 12px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+        }
+
+        .tag-selector-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .tag-selector-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag-option {
+            padding: 6px 12px;
+            background: #f3f4f6;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .tag-option:hover {
+            background: #e5e7eb;
+        }
+
+        .tag-option.selected {
+            background: #667eea;
+            border-color: #667eea;
+            color: white;
+        }
+
+        .add-new-tag {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .add-new-tag input {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .add-new-tag button {
+            padding: 8px 16px;
+            font-size: 12px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #9ca3af;
+        }
+
+        .filter-info {
+            background: #eff6ff;
+            border: 2px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            color: #1e40af;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .filter-mode-toggle {
+            display: flex;
+            gap: 5px;
+            background: white;
+            border-radius: 6px;
+            padding: 3px;
+        }
+
+        .filter-mode-btn {
+            padding: 6px 12px;
+            background: transparent;
+            color: #1e40af;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-mode-btn.active {
+            background: #1e40af;
+            color: white;
+        }
+
+        .filter-mode-btn:hover:not(.active) {
+            background: #f3f4f6;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .modal-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 200px;
+        }
+
+        .modal-textarea {
+            flex: 1;
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            resize: vertical;
+            min-height: 300px;
+        }
+
+        .modal-textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Goal & Tag Manager</h1>
+            <p>Organize your goals with powerful tagging</p>
+            <button class="export-btn" onclick="exportGoals()">📥 Export File</button>
+            <button class="export-btn" onclick="openExportTextModal()">📋 Output Text</button>
+            <div class="import-container">
+                <label for="fileInput" class="file-input-label">📤 Import File</label>
+                <input type="file" id="fileInput" accept=".txt" onchange="importGoals(event)" />
+                <button class="file-input-label" onclick="openImportTextModal()"
+                    style="border: 2px solid rgba(255,255,255,0.3); background: rgba(255,255,255,0.2);">📝 Import
+                    Text</button>
+                <button class="reset-btn" onclick="resetAllData()">🗑️ Clear All</button>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <div class="section-title">➕ Add New Goal</div>
+                <div class="input-group">
+                    <input type="text" id="goalInput" placeholder="Enter your goal..." />
+                    <button onclick="addGoal()">Add Goal</button>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">🏷️ Manage Tags</div>
+                <div class="input-group">
+                    <input type="text" id="tagInput" placeholder="Enter new tag name..." />
+                    <button onclick="addTag()">Add Tag</button>
+                </div>
+                <div class="tag-list" id="tagList"></div>
+            </div>
+
+            <div class="section">
+                <div class="section-title">
+                    📋 My Goals
+                    <span id="goalCount" style="font-size: 14px; color: #666; font-weight: normal;"></span>
+                </div>
+                <div id="filterInfo"></div>
+                <div class="goals-list" id="goalsList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import/Export Modal -->
+    <div id="textModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle" class="modal-title">Import Text</h3>
+                <button class="secondary" onclick="closeModal()"
+                    style="padding: 4px 8px; font-size: 18px;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <textarea id="modalTextarea" class="modal-textarea" placeholder="Paste your content here..."></textarea>
+            </div>
+            <div class="modal-footer" id="modalFooter">
+                <!-- Buttons injected via JS -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Database
+        let db = {
+            goals: [],
+            tags: [],
+            goalTags: {},
+            nextGoalId: 1,
+            nextTagId: 1
+        };
+
+        let activeFilters = new Set();
+        let editingGoalId = null;
+        let editingGoalTextId = null;
+        let filterMode = 'OR'; // 'OR' or 'AND'
+        let draggedGoalId = null;
+
+        // Initialize
+        function init() {
+            loadFromStorage();
+            render();
+        }
+
+        // Save to localStorage
+        function saveToStorage() {
+            localStorage.setItem('goalTagManager', JSON.stringify(db));
+        }
+
+        // Load from localStorage
+        function loadFromStorage() {
+            const saved = localStorage.getItem('goalTagManager');
+            if (saved) {
+                try {
+                    db = JSON.parse(saved);
+                    // Convert activeFilters back to Set if needed
+                } catch (e) {
+                    console.error('Error loading data:', e);
+                }
+            }
+        }
+
+        // Add Goal
+        function addGoal() {
+            const input = document.getElementById('goalInput');
+            const text = input.value.trim();
+
+            if (!text) return;
+
+            const goal = {
+                id: db.nextGoalId++,
+                text: text
+            };
+
+            db.goals.push(goal);
+            db.goalTags[goal.id] = [];
+
+            input.value = '';
+            saveToStorage();
+            render();
+        }
+
+        // Delete Goal
+        function deleteGoal(goalId) {
+            db.goals = db.goals.filter(g => g.id !== goalId);
+            delete db.goalTags[goalId];
+            saveToStorage();
+            render();
+        }
+
+        // Edit Goal Text
+        function startEditGoalText(goalId) {
+            editingGoalTextId = goalId;
+            render();
+            // Focus the input after render
+            setTimeout(() => {
+                const input = document.getElementById(`editInput${goalId}`);
+                if (input) {
+                    input.focus();
+                    input.select();
+                }
+            }, 0);
+        }
+
+        function saveGoalText(goalId) {
+            const input = document.getElementById(`editInput${goalId}`);
+            const newText = input.value.trim();
+
+            if (newText) {
+                const goal = db.goals.find(g => g.id === goalId);
+                if (goal) {
+                    goal.text = newText;
+                    saveToStorage();
+                }
+            }
+
+            editingGoalTextId = null;
+            render();
+        }
+
+        function cancelEditGoalText() {
+            editingGoalTextId = null;
+            render();
+        }
+
+        // Drag and Drop Functions
+        function handleDragStart(e, goalId) {
+            draggedGoalId = goalId;
+            e.target.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', e.target.innerHTML);
+        }
+
+        function handleDragOver(e) {
+            if (e.preventDefault) {
+                e.preventDefault();
+            }
+            e.dataTransfer.dropEffect = 'move';
+            return false;
+        }
+
+        function handleDragEnter(e) {
+            e.currentTarget.classList.add('drag-over');
+        }
+
+        function handleDragLeave(e) {
+            e.currentTarget.classList.remove('drag-over');
+        }
+
+        function handleDrop(e, targetGoalId) {
+            if (e.stopPropagation) {
+                e.stopPropagation();
+            }
+
+            e.currentTarget.classList.remove('drag-over');
+
+            if (draggedGoalId !== targetGoalId) {
+                // Find indices
+                const draggedIndex = db.goals.findIndex(g => g.id === draggedGoalId);
+                const targetIndex = db.goals.findIndex(g => g.id === targetGoalId);
+
+                // Remove dragged goal from array
+                const [draggedGoal] = db.goals.splice(draggedIndex, 1);
+
+                // Insert at new position
+                db.goals.splice(targetIndex, 0, draggedGoal);
+
+                saveToStorage();
+                render();
+            }
+
+            return false;
+        }
+
+        function handleDragEnd(e) {
+            e.target.classList.remove('dragging');
+            draggedGoalId = null;
+
+            // Remove all drag-over classes
+            document.querySelectorAll('.goal-item').forEach(item => {
+                item.classList.remove('drag-over');
+            });
+        }
+
+        // Add Tag
+        function addTag() {
+            const input = document.getElementById('tagInput');
+            const name = input.value.trim();
+
+            if (!name) return;
+
+            // Check if tag already exists
+            if (db.tags.find(t => t.name.toLowerCase() === name.toLowerCase())) {
+                alert('Tag already exists!');
+                return;
+            }
+
+            const tag = {
+                id: db.nextTagId++,
+                name: name
+            };
+
+            db.tags.push(tag);
+            input.value = '';
+            saveToStorage();
+            render();
+        }
+
+        // Delete Tag
+        function deleteTag(tagId) {
+            if (!confirm('Delete this tag? It will be removed from all goals.')) return;
+
+            db.tags = db.tags.filter(t => t.id !== tagId);
+
+            // Remove tag from all goals
+            for (let goalId in db.goalTags) {
+                db.goalTags[goalId] = db.goalTags[goalId].filter(id => id !== tagId);
+            }
+
+            // Remove from active filters
+            activeFilters.delete(tagId);
+
+            saveToStorage();
+            render();
+        }
+
+        // Toggle Tag Filter
+        function toggleTagFilter(tagId) {
+            if (activeFilters.has(tagId)) {
+                activeFilters.delete(tagId);
+            } else {
+                activeFilters.add(tagId);
+            }
+            render();
+        }
+
+        // Toggle Tag on Goal
+        function toggleGoalTag(goalId, tagId) {
+            const goalTags = db.goalTags[goalId];
+            const index = goalTags.indexOf(tagId);
+
+            if (index > -1) {
+                goalTags.splice(index, 1);
+            } else {
+                goalTags.push(tagId);
+            }
+
+            saveToStorage();
+            render();
+        }
+
+        // Add New Tag and Assign to Goal
+        function addNewTagToGoal(goalId, tagName) {
+            const name = tagName.trim();
+            if (!name) return;
+
+            // Check if tag exists
+            let tag = db.tags.find(t => t.name.toLowerCase() === name.toLowerCase());
+
+            if (!tag) {
+                tag = {
+                    id: db.nextTagId++,
+                    name: name
+                };
+                db.tags.push(tag);
+            }
+
+            // Add tag to goal if not already added
+            if (!db.goalTags[goalId].includes(tag.id)) {
+                db.goalTags[goalId].push(tag.id);
+            }
+
+            saveToStorage();
+            render();
+        }
+
+        // Toggle Tag Editor
+        function toggleTagEditor(goalId) {
+            if (editingGoalId === goalId) {
+                editingGoalId = null;
+            } else {
+                editingGoalId = goalId;
+            }
+            render();
+        }
+
+        // Get Tag Count
+        function getTagCount(tagId) {
+            let count = 0;
+            for (let goalId in db.goalTags) {
+                if (db.goalTags[goalId].includes(tagId)) {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        // Filter Goals
+        function getFilteredGoals() {
+            if (activeFilters.size === 0) {
+                return db.goals;
+            }
+
+            return db.goals.filter(goal => {
+                const goalTags = db.goalTags[goal.id];
+
+                if (filterMode === 'OR') {
+                    // Show goals that have ANY of the selected tags
+                    return Array.from(activeFilters).some(tagId => goalTags.includes(tagId));
+                } else {
+                    // Show goals that have ALL of the selected tags
+                    return Array.from(activeFilters).every(tagId => goalTags.includes(tagId));
+                }
+            });
+        }
+
+        // Toggle Filter Mode
+        function toggleFilterMode(mode) {
+            filterMode = mode;
+            render();
+        }
+
+        // Render
+        function render() {
+            renderTags();
+            renderGoals();
+            renderFilterInfo();
+        }
+
+        function renderTags() {
+            const tagList = document.getElementById('tagList');
+
+            if (db.tags.length === 0) {
+                tagList.innerHTML = '<div style="color: #999; font-size: 14px;">No tags yet. Add one above!</div>';
+                return;
+            }
+
+            tagList.innerHTML = db.tags.map(tag => {
+                const count = getTagCount(tag.id);
+                const isActive = activeFilters.has(tag.id);
+                return `
+                    <div class="tag ${isActive ? 'active' : ''}" onclick="toggleTagFilter(${tag.id})">
+                        ${tag.name}
+                        <span class="count">${count}</span>
+                        <span class="delete" onclick="event.stopPropagation(); deleteTag(${tag.id})">×</span>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderFilterInfo() {
+            const filterInfo = document.getElementById('filterInfo');
+
+            if (activeFilters.size === 0) {
+                filterInfo.innerHTML = '';
+                return;
+            }
+
+            const activeTagNames = Array.from(activeFilters)
+                .map(id => db.tags.find(t => t.id === id)?.name)
+                .filter(Boolean)
+                .join(', ');
+
+            const modeDescription = filterMode === 'OR' ? 'any of these tags' : 'all of these tags';
+
+            filterInfo.innerHTML = `
+                <div class="filter-info">
+                    <div>
+                        <span>Showing goals with <strong>${modeDescription}</strong>: <strong>${activeTagNames}</strong></span>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <div class="filter-mode-toggle">
+                            <button class="filter-mode-btn ${filterMode === 'OR' ? 'active' : ''}" onclick="toggleFilterMode('OR')">OR</button>
+                            <button class="filter-mode-btn ${filterMode === 'AND' ? 'active' : ''}" onclick="toggleFilterMode('AND')">AND</button>
+                        </div>
+                        <button class="secondary" onclick="clearFilters()" style="padding: 6px 12px;">Clear Filters</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function clearFilters() {
+            activeFilters.clear();
+            render();
+        }
+
+        // Generate Export String
+        function generateExportString() {
+            if (db.goals.length === 0) {
+                return '';
+            }
+
+            let content = '';
+
+            db.goals.forEach((goal, index) => {
+                // Add goal text
+                content += goal.text + '\n';
+
+                // Get tags for this goal
+                const goalTagIds = db.goalTags[goal.id] || [];
+                const tagNames = goalTagIds
+                    .map(tagId => db.tags.find(t => t.id === tagId)?.name)
+                    .filter(Boolean);
+
+                // Add comma-delimited tags
+                content += tagNames.join(', ') + '\n';
+
+                // Add empty line between goals (but not after the last one)
+                if (index < db.goals.length - 1) {
+                    content += '\n';
+                }
+            });
+
+            return content;
+        }
+
+        // Export Goals to File
+        function exportGoals() {
+            if (db.goals.length === 0) {
+                alert('No goals to export!');
+                return;
+            }
+
+            const content = generateExportString();
+
+            // Create blob and download
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'goals.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Export Text Modal
+        function openExportTextModal() {
+            if (db.goals.length === 0) {
+                alert('No goals to export!');
+                return;
+            }
+
+            const modal = document.getElementById('textModal');
+            const title = document.getElementById('modalTitle');
+            const textarea = document.getElementById('modalTextarea');
+            const footer = document.getElementById('modalFooter');
+
+            title.textContent = 'Output Text';
+            textarea.value = generateExportString();
+            textarea.readOnly = true;
+
+            footer.innerHTML = `
+                <button class="secondary" onclick="closeModal()">Close</button>
+                <button onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+            `;
+
+            modal.classList.add('active');
+        }
+
+        function copyToClipboard() {
+            const textarea = document.getElementById('modalTextarea');
+            textarea.select();
+            document.execCommand('copy');
+
+            // Visual feedback
+            const btn = document.querySelector('#modalFooter button:last-child');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '✅ Copied!';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+            }, 2000);
+        }
+
+        // Import Text Modal
+        function openImportTextModal() {
+            const modal = document.getElementById('textModal');
+            const title = document.getElementById('modalTitle');
+            const textarea = document.getElementById('modalTextarea');
+            const footer = document.getElementById('modalFooter');
+
+            title.textContent = 'Import from Text';
+            textarea.value = '';
+            textarea.readOnly = false;
+            textarea.placeholder = 'Paste your goal data here...\n\nFormat:\nGoal Text\ntag1, tag2\n\nGoal Text 2\ntag3';
+
+            footer.innerHTML = `
+                <button class="secondary" onclick="closeModal()">Cancel</button>
+                <button onclick="handleTextImport()">📥 Import</button>
+            `;
+
+            modal.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('textModal').classList.remove('active');
+        }
+
+        function handleTextImport() {
+            const content = document.getElementById('modalTextarea').value;
+            if (!content.trim()) {
+                alert('Please paste some content first.');
+                return;
+            }
+
+            if (processImportContent(content)) {
+                closeModal();
+            }
+        }
+
+        // Shared Import Logic
+        function processImportContent(content) {
+            if (!confirm('This will replace all your current goals and tags. Continue?')) {
+                return false;
+            }
+
+            try {
+                const lines = content.split('\n');
+
+                // Reset database
+                db.goals = [];
+                db.tags = [];
+                db.goalTags = {};
+                db.nextGoalId = 1;
+                db.nextTagId = 1;
+
+                const tagMap = new Map(); // Track tag names to IDs
+
+                // Process lines in pairs (goal, tags, empty line)
+                for (let i = 0; i < lines.length; i++) {
+                    const goalText = lines[i].trim();
+
+                    // Skip empty lines at points where we expect a goal
+                    if (!goalText) continue;
+
+                    // Create goal
+                    const goal = {
+                        id: db.nextGoalId++,
+                        text: goalText
+                    };
+                    db.goals.push(goal);
+                    db.goalTags[goal.id] = [];
+
+                    // Process tags on next line (if exists)
+                    i++;
+                    if (i < lines.length) {
+                        const tagsLine = lines[i].trim();
+                        if (tagsLine) {
+                            const tagNames = tagsLine.split(',').map(t => t.trim()).filter(Boolean);
+
+                            tagNames.forEach(tagName => {
+                                // Check if tag already exists
+                                let tagId = tagMap.get(tagName.toLowerCase());
+
+                                if (!tagId) {
+                                    // Create new tag
+                                    const tag = {
+                                        id: db.nextTagId++,
+                                        name: tagName
+                                    };
+                                    db.tags.push(tag);
+                                    tagMap.set(tagName.toLowerCase(), tag.id);
+                                    tagId = tag.id;
+                                }
+
+                                // Associate tag with goal
+                                db.goalTags[goal.id].push(tagId);
+                            });
+                        }
+                    }
+                }
+
+                saveToStorage();
+                render();
+                alert(`Successfully imported ${db.goals.length} goals and ${db.tags.length} tags!`);
+                return true;
+
+            } catch (error) {
+                console.error('Import error:', error);
+                alert('Error importing data. Please check the format.');
+                return false;
+            }
+        }
+
+        // Import Goals from File
+        function importGoals(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const content = e.target.result;
+                processImportContent(content);
+
+                // Reset file input
+                event.target.value = '';
+            };
+
+            reader.readAsText(file);
+        }
+
+        // Reset All Data
+        function resetAllData() {
+            if (!confirm('Are you sure you want to delete ALL goals and tags? This cannot be undone!')) {
+                return;
+            }
+
+            // Double confirmation for safety
+            if (!confirm('This will permanently delete everything. Are you absolutely sure?')) {
+                return;
+            }
+
+            // Reset database
+            db.goals = [];
+            db.tags = [];
+            db.goalTags = {};
+            db.nextGoalId = 1;
+            db.nextTagId = 1;
+
+            // Clear filters
+            activeFilters.clear();
+            editingGoalId = null;
+
+            saveToStorage();
+            render();
+
+            alert('All data has been cleared.');
+        }
+
+        function renderGoals() {
+            const goalsList = document.getElementById('goalsList');
+            const goalCount = document.getElementById('goalCount');
+            const filteredGoals = getFilteredGoals();
+
+            goalCount.textContent = `(${filteredGoals.length} ${filteredGoals.length === 1 ? 'goal' : 'goals'})`;
+
+            if (filteredGoals.length === 0) {
+                goalsList.innerHTML = '<div class="empty-state">No goals yet. Add your first goal above!</div>';
+                return;
+            }
+
+            goalsList.innerHTML = filteredGoals.map(goal => {
+                const goalTags = db.goalTags[goal.id] || [];
+                const isEditing = editingGoalId === goal.id;
+                const isEditingText = editingGoalTextId === goal.id;
+
+                return `
+                    <div class="goal-item" 
+                         draggable="true"
+                         ondragstart="handleDragStart(event, ${goal.id})"
+                         ondragover="handleDragOver(event)"
+                         ondragenter="handleDragEnter(event)"
+                         ondragleave="handleDragLeave(event)"
+                         ondrop="handleDrop(event, ${goal.id})"
+                         ondragend="handleDragEnd(event)">
+                        <div class="goal-header">
+                            ${isEditingText ? `
+                                <input type="text" id="editInput${goal.id}" class="goal-edit-input" value="${goal.text}" 
+                                       onkeypress="if(event.key==='Enter') saveGoalText(${goal.id})"
+                                       onblur="saveGoalText(${goal.id})" />
+                            ` : `
+                                <div class="goal-text" onclick="startEditGoalText(${goal.id})" style="cursor: pointer;" title="Click to edit">
+                                    <span style="opacity: 0.4; margin-right: 8px; cursor: move;" title="Drag to reorder">⋮⋮</span>${goal.text}
+                                </div>
+                            `}
+                            <div class="goal-actions">
+                                ${isEditingText ? `
+                                    <button onclick="saveGoalText(${goal.id})">Save</button>
+                                    <button class="secondary" onclick="cancelEditGoalText()">Cancel</button>
+                                ` : `
+                                    <button class="secondary" onclick="toggleTagEditor(${goal.id})">
+                                        ${isEditing ? 'Done' : '🏷️ Tags'}
+                                    </button>
+                                    <button class="danger" onclick="deleteGoal(${goal.id})">Delete</button>
+                                `}
+                            </div>
+                        </div>
+                        
+                        ${goalTags.length > 0 ? `
+                            <div class="goal-tags">
+                                ${goalTags.map(tagId => {
+                    const tag = db.tags.find(t => t.id === tagId);
+                    return tag ? `
+                                        <div class="goal-tag">
+                                            ${tag.name}
+                                            <span class="remove" onclick="toggleGoalTag(${goal.id}, ${tagId})">×</span>
+                                        </div>
+                                    ` : '';
+                }).join('')}
+                            </div>
+                        ` : ''}
+                        
+                        ${isEditing ? `
+                            <div class="tag-selector">
+                                <div class="tag-selector-title">Select existing tags or add new:</div>
+                                <div class="tag-selector-list">
+                                    ${db.tags.map(tag => {
+                    const isSelected = goalTags.includes(tag.id);
+                    return `
+                                            <div class="tag-option ${isSelected ? 'selected' : ''}" 
+                                                 onclick="toggleGoalTag(${goal.id}, ${tag.id})">
+                                                ${tag.name}
+                                            </div>
+                                        `;
+                }).join('')}
+                                </div>
+                                <div class="add-new-tag">
+                                    <input type="text" id="newTag${goal.id}" placeholder="Add new tag..." 
+                                           onkeypress="if(event.key==='Enter') { addNewTagToGoal(${goal.id}, this.value); this.value=''; }" />
+                                    <button onclick="const input = document.getElementById('newTag${goal.id}'); addNewTagToGoal(${goal.id}, input.value); input.value='';">
+                                        Add & Assign
+                                    </button>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Enter key support
+        document.getElementById('goalInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addGoal();
+        });
+
+        document.getElementById('tagInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') addTag();
+        });
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+
+</html>
