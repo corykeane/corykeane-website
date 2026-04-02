@@ -44,12 +44,14 @@
             <div class="masthead-content text-white">
                 <div class="container-fluid px-4 px-lg-0">
                     <h1 class="fst-italic lh-1 mb-4">Cory Keane's Website is Coming Soon.</h1>
-                    <p class="mb-5">A collection of my thoughts and experiences - Sign up below to receive updates! <a href="/privacy" style="color:#0091e6;font-size:12px;">Privacy Policy</a></p>
+                    <p class="mb-5">A collection of my thoughts and experiences - Sign up below to receive updates!</p>
                     <form id="my-form" action="https://formspree.io/f/xzzvgbow" method="POST">
                         <div class="row input-group-newsletter">
                             <div class="col"><input name="email" class="form-control" id="email" type="email" placeholder="Enter email address..." aria-label="Enter email address..." required /></div>
                             <div class="col-auto"><button class="btn btn-primary" id="my-form-button" type="submit">Sign Up</button></div>
                         </div>
+                        <br>
+                        <input type="checkbox" name="agree_terms" required> I agree to the <a href="/privacy" style="color:#0091e6;font-size:12px;">Privacy Policy</a>
                         <div class="d-none" id="submitErrorMessage"><div class="text-center text-danger mb-3 mt-2">Error sending message!</div></div>
                         <p id="my-form-status">&nbsp;</p>
                     </form>
@@ -67,40 +69,6 @@
 
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
         <script src="js/scripts.js"></script>
-        
-        <!-- Formspree Form Code -->
-        <script>
-          var form = document.getElementById("my-form");
-          
-          async function handleSubmit(event) {
-            event.preventDefault();
-            var status = document.getElementById("my-form-status");
-            var data = new FormData(event.target);
-            fetch(event.target.action, {
-              method: form.method,
-              body: data,
-              headers: {
-                  'Accept': 'application/json'
-              }
-            }).then(response => {
-              if (response.ok) {
-                status.innerHTML = "Thanks for signing up!";
-                form.reset()
-              } else {
-                response.json().then(data => {
-                  if (Object.hasOwn(data, 'errors')) {
-                    status.innerHTML = data["errors"].map(error => error["message"]).join(", ")
-                  } else {
-                    status.innerHTML = "Oops! There was a problem submitting your form"
-                  }
-                })
-              }
-            }).catch(error => {
-              status.innerHTML = "Oops! There was a problem submitting your form"
-            });
-          }
-          form.addEventListener("submit", handleSubmit)
-        </script>
 
         <script>
           document.addEventListener("DOMContentLoaded", () => {
